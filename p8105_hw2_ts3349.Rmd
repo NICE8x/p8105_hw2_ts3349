@@ -103,17 +103,28 @@ How many stations are ADA compliant?
 What proportion of station entrances / exits without vending allow entrance?
 
 ```{r}
-nyc_stations_df <- nyc_transit_df %>% unite(distinct_stations, c("line", "station_name"), sep = "_") %>% group_by(distinct_stations) %>% count()
+nyc_stations_df <- nyc_transit_df %>% 
+  unite(distinct_stations, c("line", "station_name"), sep = "_") %>% 
+  group_by(distinct_stations) %>%
+  count()
 
 nrow(nyc_stations_df)
 head(nyc_stations_df)
-#View(nyc_stations_df)
 #465
+
+nyc_stations_ADA <- nyc_transit_df %>% 
+  unite(distinct_stations, c("line", "station_name"), sep = "_") %>% 
+  group_by(distinct_stations, ada) %>%
+  summarize()
+
+head(nyc_stations_ADA)
+sum(pull(nyc_stations_ADA, ada))
+#84
 
   
 ```
 
-
+There are `r nrow(nyc_stations_df)` distinct stations.  Of those stations, `r sum(pull(nyc_stations_ADA, ada))` are ADA compliant. 
 
 
 
