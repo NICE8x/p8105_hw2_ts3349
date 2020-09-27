@@ -96,20 +96,16 @@ head(nyc_transit_df)
 This data set contains information about the New York City transit system (the Metropolitan Transportation Authority of the State of New York), specifically the NYC subway stations and their entrances and exits.  The data set contains information on station names, station latitude/longitude, lines, routes, ability to enter, entrance type, and whether the station is ADA accessible.  In cleaning the data, many columns were removed including division, column regarding staffing, columns with notes, corner location, and columns regarding entrance location.  Only the variables previously mentioned were selected and all variable names were cleaned to follow snake case.  The entry variable was converted from a character variable to a logical variable where "YES" was converted to "TRUE" meaning if the station has an entry the entry variable is "TRUE" and if the station does not have an entry it is "FALSE" instead of "NO".  The data set has `r nrow(nyc_transit_df)` rows and `r ncol(nyc_transit_df)` columns.  The data is not tidy yet because each different route is a column.  Route is a variable and should have one column containing the different routes.
 
 
-Answer the following questions using these data:
-
-How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St A/B/C/D; 125st 1; 125st 4/5); the distinct function may be useful here.
-How many stations are ADA compliant?
-What proportion of station entrances / exits without vending allow entrance?
-
+Answer Questions about the NYC Transit data:
 ```{r}
 nyc_stations_df <- nyc_transit_df %>% 
   unite(distinct_stations, c("line", "station_name"), sep = "_") %>% 
   group_by(distinct_stations) %>%
   count()
 
-nrow(nyc_stations_df)
 head(nyc_stations_df)
+nrow(nyc_stations_df)
+
 #465
 
 nyc_stations_ADA <- nyc_transit_df %>% 
@@ -121,10 +117,23 @@ head(nyc_stations_ADA)
 sum(pull(nyc_stations_ADA, ada))
 #84
 
+nyc_stations_entrance <- nyc_transit_df %>% 
+  unite(distinct_stations, c("line", "station_name"), sep = "_") %>%
+  filter(vending == "NO") %>%
+  group_by(distinct_stations, entry) %>%
+  summarize()
+
+head(nyc_stations_entrance)
+sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)
+#0.3873874
+
+  
+
   
 ```
 
-There are `r nrow(nyc_stations_df)` distinct stations.  Of those stations, `r sum(pull(nyc_stations_ADA, ada))` are ADA compliant. 
+There are `r nrow(nyc_stations_df)` distinct stations.  Of all the stations, `r sum(pull(nyc_stations_ADA, ada))` are ADA compliant.The proportion of stations entrance/exits without vending that allow entry is `r sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)`.
+   
 
 
 
