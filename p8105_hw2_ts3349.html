@@ -1641,15 +1641,16 @@ summary {
 
 
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages ----------------------------------------------- tidyverse 1.3.0 --</code></pre>
+<pre><code>## -- Attaching packages ------------------------------------------------- tidyverse 1.3.0 --</code></pre>
 <pre><code>## v ggplot2 3.3.2     v purrr   0.3.4
 ## v tibble  3.0.3     v dplyr   1.0.2
 ## v tidyr   1.1.2     v stringr 1.4.0
 ## v readr   1.3.1     v forcats 0.5.0</code></pre>
-<pre><code>## -- Conflicts -------------------------------------------------- tidyverse_conflicts() --
+<pre><code>## -- Conflicts ---------------------------------------------------- tidyverse_conflicts() --
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(readxl)</code></pre>
+<pre class="r"><code>library(readxl)
+library(readr)</code></pre>
 <div id="problem-1" class="section level2">
 <h2>Problem 1</h2>
 <p>Read the Mr. Trashwheel data set.</p>
@@ -1709,6 +1710,84 @@ head(precip_df)</code></pre>
   </script>
 </div>
 <p>This data set contains information from the Mr. Trashwheel trash collector in Baltimore, Maryland. As trash enters the inner harbor, the trashwheel collects that trash and stores it in a dumpster. The dataset contains information on year, month, and trash collected including like plastic bottles, chip bags, and sports balls. There are a total of 344 rows in the final data set. The median number of sports balls for example is 8. There are additional data sheets which include month precipitation data.</p>
+</div>
+<div id="problem-2" class="section level2">
+<h2>Problem 2</h2>
+<p>Read the NYC Transit data.</p>
+<pre class="r"><code>nyc_transit_df &lt;- read_csv(&quot;./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv&quot;) %&gt;%
+  janitor::clean_names() %&gt;% 
+  select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %&gt;%
+  mutate(entry = recode(entry, YES = TRUE, NO = FALSE))</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_character(),
+##   `Station Latitude` = col_double(),
+##   `Station Longitude` = col_double(),
+##   Route8 = col_double(),
+##   Route9 = col_double(),
+##   Route10 = col_double(),
+##   Route11 = col_double(),
+##   ADA = col_logical(),
+##   `Free Crossover` = col_logical(),
+##   `Entrance Latitude` = col_double(),
+##   `Entrance Longitude` = col_double()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>head(nyc_transit_df)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["line"],"name":[1],"type":["chr"],"align":["left"]},{"label":["station_name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["station_latitude"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["station_longitude"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["route1"],"name":[5],"type":["chr"],"align":["left"]},{"label":["route2"],"name":[6],"type":["chr"],"align":["left"]},{"label":["route3"],"name":[7],"type":["chr"],"align":["left"]},{"label":["route4"],"name":[8],"type":["chr"],"align":["left"]},{"label":["route5"],"name":[9],"type":["chr"],"align":["left"]},{"label":["route6"],"name":[10],"type":["chr"],"align":["left"]},{"label":["route7"],"name":[11],"type":["chr"],"align":["left"]},{"label":["route8"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["route9"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["route10"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["route11"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["entry"],"name":[16],"type":["lgl"],"align":["right"]},{"label":["vending"],"name":[17],"type":["chr"],"align":["left"]},{"label":["entrance_type"],"name":[18],"type":["chr"],"align":["left"]},{"label":["ada"],"name":[19],"type":["lgl"],"align":["right"]}],"data":[{"1":"4 Avenue","2":"25th St","3":"40.66040","4":"-73.99809","5":"R","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA","16":"TRUE","17":"YES","18":"Stair","19":"FALSE"},{"1":"4 Avenue","2":"25th St","3":"40.66040","4":"-73.99809","5":"R","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA","16":"TRUE","17":"YES","18":"Stair","19":"FALSE"},{"1":"4 Avenue","2":"36th St","3":"40.65514","4":"-74.00355","5":"N","6":"R","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA","16":"TRUE","17":"YES","18":"Stair","19":"FALSE"},{"1":"4 Avenue","2":"36th St","3":"40.65514","4":"-74.00355","5":"N","6":"R","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA","16":"TRUE","17":"YES","18":"Stair","19":"FALSE"},{"1":"4 Avenue","2":"36th St","3":"40.65514","4":"-74.00355","5":"N","6":"R","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA","16":"TRUE","17":"YES","18":"Stair","19":"FALSE"},{"1":"4 Avenue","2":"45th St","3":"40.64894","4":"-74.01001","5":"R","6":"NA","7":"NA","8":"NA","9":"NA","10":"NA","11":"NA","12":"NA","13":"NA","14":"NA","15":"NA","16":"TRUE","17":"YES","18":"Stair","19":"FALSE"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>#View(nyc_transit_df)</code></pre>
+<p>This data set contains information about the New York City transit system (the Metropolitan Transportation Authority of the State of New York), specifically the NYC subway stations and their entrances and exits. The data set contains information on station names, station latitude/longitude, lines, routes, ability to enter, entrance type, and whether the station is ADA accessible. In cleaning the data, many columns were removed including division, column regarding staffing, columns with notes, corner location, and columns regarding entrance location. Only the variables previously mentioned were selected and all variable names were cleaned to follow snake case. The entry variable was converted from a character variable to a logical variable where “YES” was converted to “TRUE” meaning if the station has an entry the entry variable is “TRUE” and if the station does not have an entry it is “FALSE” instead of “NO”. The data set has 1868 rows and 19 columns. The data is not tidy yet because each different route is a column. Route is a variable and should have one column containing the different routes.</p>
+<p>Answer Questions about the NYC Transit data:</p>
+<pre class="r"><code>nyc_stations_df &lt;- nyc_transit_df %&gt;% 
+  unite(distinct_stations, c(&quot;line&quot;, &quot;station_name&quot;), sep = &quot;_&quot;) %&gt;% 
+  group_by(distinct_stations) %&gt;%
+  count()
+
+head(nyc_stations_df)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["distinct_stations"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"4 Avenue_25th St","2":"2"},{"1":"4 Avenue_36th St","2":"3"},{"1":"4 Avenue_45th St","2":"4"},{"1":"4 Avenue_53rd St","2":"5"},{"1":"4 Avenue_59th St","2":"6"},{"1":"4 Avenue_77th St","2":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>nrow(nyc_stations_df)</code></pre>
+<pre><code>## [1] 465</code></pre>
+<pre class="r"><code>#465
+
+nyc_stations_ADA &lt;- nyc_transit_df %&gt;% 
+  unite(distinct_stations, c(&quot;line&quot;, &quot;station_name&quot;), sep = &quot;_&quot;) %&gt;% 
+  group_by(distinct_stations, ada) %&gt;%
+  summarize()</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;distinct_stations&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>head(nyc_stations_ADA)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["distinct_stations"],"name":[1],"type":["chr"],"align":["left"]},{"label":["ada"],"name":[2],"type":["lgl"],"align":["right"]}],"data":[{"1":"4 Avenue_25th St","2":"FALSE"},{"1":"4 Avenue_36th St","2":"FALSE"},{"1":"4 Avenue_45th St","2":"FALSE"},{"1":"4 Avenue_53rd St","2":"FALSE"},{"1":"4 Avenue_59th St","2":"FALSE"},{"1":"4 Avenue_77th St","2":"FALSE"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>sum(pull(nyc_stations_ADA, ada))</code></pre>
+<pre><code>## [1] 84</code></pre>
+<pre class="r"><code>#84
+
+nyc_stations_entrance &lt;- nyc_transit_df %&gt;% 
+  unite(distinct_stations, c(&quot;line&quot;, &quot;station_name&quot;), sep = &quot;_&quot;) %&gt;%
+  filter(vending == &quot;NO&quot;) %&gt;%
+  group_by(distinct_stations, entry) %&gt;%
+  summarize()</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;distinct_stations&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>head(nyc_stations_entrance)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["distinct_stations"],"name":[1],"type":["chr"],"align":["left"]},{"label":["entry"],"name":[2],"type":["lgl"],"align":["right"]}],"data":[{"1":"4 Avenue_53rd St","2":"FALSE"},{"1":"4 Avenue_77th St","2":"FALSE"},{"1":"4 Avenue_9th St","2":"TRUE"},{"1":"4 Avenue_Bay Ridge Av","2":"FALSE"},{"1":"42nd St Shuttle_Grand Central","2":"FALSE"},{"1":"6 Avenue_7th Av","2":"TRUE"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)</code></pre>
+<pre><code>## [1] 0.3873874</code></pre>
+<pre class="r"><code>#0.3873874</code></pre>
+<p>There are 465 distinct stations. Of all the stations, 84 are ADA compliant.The proportion of stations entrance/exits without vending that allow entry is 0.3873874.</p>
 </div>
 
 
