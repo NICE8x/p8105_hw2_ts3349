@@ -135,6 +135,19 @@ sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)
 There are `r nrow(nyc_stations_df)` distinct stations.  Of all the stations, `r sum(pull(nyc_stations_ADA, ada))` are ADA compliant.The proportion of stations entrance/exits without vending that allow entry is `r sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)`.
    
 
+Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+
+```{r reformat NYC transit data}
+nyc_transit_df_2 <- nyc_transit_df %>% pivot_longer(
+    route1:route11,
+    names_to = "route_name", 
+    values_to = "route_number")
+
+View(nyc_transit_df_2)
+
+
+
+```
 
 
 
