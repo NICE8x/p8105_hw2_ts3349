@@ -179,9 +179,12 @@ clean the data in snp.csv using a similar process to the above. For consistency 
   View(pols_month_df)
 snp_df <- read_csv("./data/fivethirtyeight_datasets/snp.csv") %>% 
   janitor::clean_names() %>% 
-  drop_na(dumpster) %>% 
-  mutate(sports_balls = round(sports_balls), 
-         sports_balls = as.integer(sports_balls))
+  mutate(month_2 = month(mdy(date), label = TRUE, abbr = FALSE)) %>%
+  separate(date, into=c("year", "month", "day"), sep = "-") %>%
+  mutate(month = str_to_lower(month_2)) %>%
+  select(!month_2 & !day) 
+
+View(snp_df)
 ```
 
 ```{r fivethirtyeight unemployment data}
