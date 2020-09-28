@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
 library(readr)
+library(lubridate)
 ```
 
 
@@ -71,7 +72,7 @@ precip_df <- bind_rows(precip_2018,precip_2017)
 
 precip_df <- left_join(precip_df, month_df, by = "month") %>% 
   select(!month) %>% 
-  mutate(month_name = tolower(month_name))
+  mutate(month_name = str_to_lower(month_name))
 
 head(precip_df)
 ```
@@ -135,7 +136,7 @@ sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)
 There are `r nrow(nyc_stations_df)` distinct stations.  Of all the stations, `r sum(pull(nyc_stations_ADA, ada))` are ADA compliant.The proportion of stations entrance/exits without vending that allow entry is `r sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)`.
    
 
-Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?  NEED TO SOLVE THESE QUESTIONS!!!!!
 
 ```{r reformat NYC transit data}
 nyc_transit_df_tidy <- nyc_transit_df %>%
@@ -153,6 +154,47 @@ View(nyc_transit_df_tidy)
 
 
 ```
+
+
+## Problem 3
+
+Read in the FiveThirtyEight pols_month data.
+```{r read fivethirtyeight pols_month data}
+pols_month_df <- read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>% 
+  janitor::clean_names() %>%
+  mutate(month_2 = month(ymd(mon), label = TRUE, abbr = FALSE)) %>%
+  separate(mon, into=c("year", "month", "day"), sep = "-") %>%
+  mutate(month = str_to_lower(month_2)) %>%
+  select(!month_2) %>%
+  mutate(president = case_when(prez_gop == 1 ~ "gop", prez_gop == 2 ~ "gop_ford_after_nixon", prez_gop == 0 ~ "dem")) %>%
+  select(!prez_gop & !prez_dem & !day) 
+```
+
+
+
+pols-month.csv, unemployment.csv, and snp.csv. Our goal is to merge these into a single data frame using year and month as keys across datasets.
+
+clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns
+```{r fivethirtyeight snp data}
+  View(pols_month_df)
+snp_df <- read_csv("./data/fivethirtyeight_datasets/snp.csv") %>% 
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  mutate(sports_balls = round(sports_balls), 
+         sports_balls = as.integer(sports_balls))
+```
+
+```{r fivethirtyeight unemployment data}
+unemployment_df <- read_csv("./data/fivethirtyeight_datasets/unemployment.csv") %>% 
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  mutate(sports_balls = round(sports_balls), 
+         sports_balls = as.integer(sports_balls))
+
+
+head(trashwheel_df)
+```
+
 
 
 
