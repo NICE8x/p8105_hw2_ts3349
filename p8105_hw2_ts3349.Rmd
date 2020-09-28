@@ -138,12 +138,17 @@ There are `r nrow(nyc_stations_df)` distinct stations.  Of all the stations, `r 
 Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
 
 ```{r reformat NYC transit data}
-nyc_transit_df_2 <- nyc_transit_df %>% pivot_longer(
+nyc_transit_df_tidy <- nyc_transit_df %>%
+  mutate(route8 = as.character(route8)) %>%
+  mutate(route9 = as.character(route9)) %>%
+  mutate(route10 = as.character(route10)) %>%
+  mutate(route11 = as.character(route11)) %>%
+  pivot_longer(
     route1:route11,
     names_to = "route_name", 
     values_to = "route_number")
 
-View(nyc_transit_df_2)
+View(nyc_transit_df_tidy)
 
 
 
