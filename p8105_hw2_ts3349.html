@@ -1650,7 +1650,13 @@ summary {
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(readxl)
-library(readr)</code></pre>
+library(readr)
+library(lubridate)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
 <div id="problem-1" class="section level2">
 <h2>Problem 1</h2>
 <p>Read the Mr. Trashwheel data set.</p>
@@ -1701,7 +1707,7 @@ precip_df &lt;- bind_rows(precip_2018,precip_2017)
 
 precip_df &lt;- left_join(precip_df, month_df, by = &quot;month&quot;) %&gt;% 
   select(!month) %&gt;% 
-  mutate(month_name = tolower(month_name))
+  mutate(month_name = str_to_lower(month_name))
 
 head(precip_df)</code></pre>
 <div data-pagedtable="false">
@@ -1788,6 +1794,100 @@ nyc_stations_entrance &lt;- nyc_transit_df %&gt;%
 <pre><code>## [1] 0.3873874</code></pre>
 <pre class="r"><code>#0.3873874</code></pre>
 <p>There are 465 distinct stations. Of all the stations, 84 are ADA compliant.The proportion of stations entrance/exits without vending that allow entry is 0.3873874.</p>
+<p>Answer questions regarding the A train:</p>
+<pre class="r"><code>nyc_transit_df_tidy &lt;- nyc_transit_df %&gt;%
+  mutate(route8 = as.character(route8)) %&gt;%
+  mutate(route9 = as.character(route9)) %&gt;%
+  mutate(route10 = as.character(route10)) %&gt;%
+  mutate(route11 = as.character(route11)) %&gt;%
+  pivot_longer(
+    route1:route11,
+    names_to = &quot;route_name&quot;, 
+    values_to = &quot;route_number&quot;)
+
+nyc_transit_A_train_df &lt;- nyc_transit_df_tidy %&gt;% unite(distinct_stations, c(&quot;line&quot;, &quot;station_name&quot;), sep = &quot;_&quot;) %&gt;% 
+  filter(route_number == &quot;A&quot;) %&gt;%
+  group_by(distinct_stations, route_number, ada) %&gt;%
+  summarize()</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;distinct_stations&#39;, &#39;route_number&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>nrow(nyc_transit_A_train_df)</code></pre>
+<pre><code>## [1] 60</code></pre>
+<pre class="r"><code>sum(pull(nyc_transit_A_train_df, ada))</code></pre>
+<pre><code>## [1] 17</code></pre>
+<pre class="r"><code>#View(nyc_transit_df_tidy)
+#View(nyc_transit_A_train_df)</code></pre>
+<p>60 distinct stations serve the A train. Of the stations that serve the A train, 17 are ADA compliant.</p>
+</div>
+<div id="problem-3" class="section level2">
+<h2>Problem 3</h2>
+<p>Read in the FiveThirtyEight pols_month data.</p>
+<pre class="r"><code>pols_month_df &lt;- read_csv(&quot;./data/fivethirtyeight_datasets/pols-month.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;%
+  mutate(month_2 = month(ymd(mon), label = TRUE, abbr = TRUE)) %&gt;%
+  separate(mon, into=c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;%
+  mutate(month = str_to_lower(month_2)) %&gt;%
+  select(!month_2) %&gt;%
+  mutate(president = case_when(prez_gop == 1 ~ &quot;gop&quot;, prez_gop == 2 ~ &quot;gop_ford_after_nixon&quot;, prez_gop == 0 ~ &quot;dem&quot;)) %&gt;%
+  select(!prez_gop &amp; !prez_dem &amp; !day) </code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   mon = col_date(format = &quot;&quot;),
+##   prez_gop = col_double(),
+##   gov_gop = col_double(),
+##   sen_gop = col_double(),
+##   rep_gop = col_double(),
+##   prez_dem = col_double(),
+##   gov_dem = col_double(),
+##   sen_dem = col_double(),
+##   rep_dem = col_double()
+## )</code></pre>
+<p>pols-month.csv, unemployment.csv, and snp.csv. Our goal is to merge these into a single data frame using year and month as keys across datasets.</p>
+<p>clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns</p>
+<p>WHICH IS MONTH AND WHICH IS DAY PLEAE FIX!</p>
+<pre class="r"><code>snp_df &lt;- read_csv(&quot;./data/fivethirtyeight_datasets/snp.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(month_2 = month(mdy(date), label = TRUE, abbr = TRUE)) %&gt;%
+  separate(date, into=c(&quot;month&quot;, &quot;day&quot;, &quot;year&quot;), sep = &quot;/&quot;) %&gt;%
+  mutate(month = str_to_lower(month_2)) %&gt;%
+  select(!month_2 &amp; !day)  %&gt;%
+  relocate(year)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   date = col_character(),
+##   close = col_double()
+## )</code></pre>
+<pre class="r"><code>#View(snp_df)</code></pre>
+<p>Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.</p>
+<pre class="r"><code>unemployment_df &lt;- read_csv(&quot;./data/fivethirtyeight_datasets/unemployment.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;%
+  pivot_longer(
+    jan:dec,
+    names_to = &quot;month&quot;, 
+    values_to = &quot;unemployment_rate&quot;) %&gt;%
+  mutate(year = as.character(year))</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   Year = col_double(),
+##   Jan = col_double(),
+##   Feb = col_double(),
+##   Mar = col_double(),
+##   Apr = col_double(),
+##   May = col_double(),
+##   Jun = col_double(),
+##   Jul = col_double(),
+##   Aug = col_double(),
+##   Sep = col_double(),
+##   Oct = col_double(),
+##   Nov = col_double(),
+##   Dec = col_double()
+## )</code></pre>
+<pre class="r"><code>#View(unemployment_df)</code></pre>
+<p>Join the datasets by merging snp into pols, and merging unemployment into the result</p>
+<pre class="r"><code>pols_snp_df &lt;- left_join(pols_month_df, snp_df, by=c(&quot;year&quot; = &quot;year&quot;, &quot;month&quot; = &quot;month&quot;))
+View(pols_snp_df)
+
+pols_snp_unemployment_df &lt;- left_join(pols_snp_df, unemployment_df, by=c(&quot;year&quot; = &quot;year&quot;, &quot;month&quot; = &quot;month&quot;))
+View(pols_snp_unemployment_df)</code></pre>
 </div>
 
 
