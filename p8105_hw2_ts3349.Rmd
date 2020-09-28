@@ -206,7 +206,7 @@ unemployment_df <- read_csv("./data/fivethirtyeight_datasets/unemployment.csv") 
 
 #View(unemployment_df)
 ```
-Join the datasets by merging snp into pols, and merging unemployment into the result
+Join the datasets by merging snp into pols, and merging unemployment into the result:
 ```{r join fivethirtyeight data}
 pols_snp_df <- left_join(pols_month_df, snp_df, by=c("year" = "year", "month" = "month"))
 View(pols_snp_df)

@@ -1882,7 +1882,7 @@ nyc_transit_A_train_df &lt;- nyc_transit_df_tidy %&gt;% unite(distinct_stations,
 ##   Dec = col_double()
 ## )</code></pre>
 <pre class="r"><code>#View(unemployment_df)</code></pre>
-<p>Join the datasets by merging snp into pols, and merging unemployment into the result</p>
+<p>Join the datasets by merging snp into pols, and merging unemployment into the result:</p>
 <pre class="r"><code>pols_snp_df &lt;- left_join(pols_month_df, snp_df, by=c(&quot;year&quot; = &quot;year&quot;, &quot;month&quot; = &quot;month&quot;))
 View(pols_snp_df)
 
