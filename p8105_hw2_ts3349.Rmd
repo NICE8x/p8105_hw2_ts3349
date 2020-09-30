@@ -215,6 +215,11 @@ pols_snp_unemployment_df <- left_join(pols_snp_df, unemployment_df, by=c("year" 
 View(pols_snp_unemployment_df)
 ```
 
+The three data sets, pols-month.csv, unemployment.csv, and snp.csv are from a larger collection of data sets from the website FiveThirtyEight.  They are used in an interactive graphic which is a part of an article called "Science Isn't Broken".  The graphic demonstrates how data about Republicans and Democrats in office can be manipulated to provide desired results about the US economy.  The pols-month data set contains information regarding the number of national politicians who are democratic or republican at any given time.  This includes variables like mon(date), prez_gop (whether the president is GOP or not), and sen_dem(the number of democratic senators).  The unemployment data set contains a year variable and a variable for each month.  For each year and month the unemployment rate is provided.  The snp data set contains information related to Standard & Poor’s stock market index (S&P) and includes two variables; date(date of observation) and close(closing stock market values).  The data set combining these three data sets has `r ncol(pols_snp_unemployment_df)` variables and `r nrow(pols_snp_unemployment_df)` rows.  The years included in the data set range from `r min(pull(pols_snp_unemployment_df, year))` to `r max(pull(pols_snp_unemployment_df, year))`.  The key variables are the month, year, president(whether the president was republican or democratic), close(stock market closing values), unemployment_rate, and 6 variables indicating the number of republican and democratic senators, representatives, and governors.
+
+
+
+
 
 
 
