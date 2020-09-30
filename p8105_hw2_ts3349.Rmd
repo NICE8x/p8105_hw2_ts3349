@@ -2,7 +2,9 @@
 title: "p8105_hw2_ts3349"
 author: "Tessa Senders"
 date: "9/25/2020"
-output: github_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -34,7 +36,6 @@ head(trashwheel_df)
 ```
 
 
-
 Read the precipitation data sets for 2017 and 2018.
 
 ```{r precip}
@@ -55,9 +56,10 @@ precip_2017 <- read_xlsx("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
   relocate(year)
 
 head(precip_2017)
+head(precip_2018)
 ```
 
-
+Combine precip data for 2017 and 2018.
 
 ```{r bind}
 month_df <- 
@@ -74,7 +76,7 @@ precip_df <- left_join(precip_df, month_df, by = "month") %>%
 
 head(precip_df)
 ```
-This data set contains information from the Mr. Trashwheel trash collector in Baltimore, Maryland.  As trash enters the inner harbor, the trashwheel collects that trash and stores it in a  dumpster.  The dataset contains information on year, month, and trash collected including like plastic bottles, chip bags, and sports balls.  There are a total of `r nrow(trashwheel_df)` rows in the final data set.  The median number of sports balls for example is `r median(pull(trashwheel_df, sports_balls))`.  There are additional data sheets which include month precipitation data.
+This data set contains information from the Mr. Trashwheel trash collector in Baltimore, Maryland.  As trash enters the inner harbor, the trashwheel collects that trash and stores it in a  dumpster.  The data set contains information on year, month, and trash collected including like plastic bottles, chip bags, and sports balls.  There are a total of `r nrow(trashwheel_df)` rows in the final data set.  The median number of sports balls for example is `r median(pull(trashwheel_df, sports_balls))`.  There are additional data sheets which include month precipitation data.
 
 
 ## Problem 2
@@ -89,13 +91,12 @@ nyc_transit_df <- read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv
 
   
 head(nyc_transit_df)
-#View(nyc_transit_df)
 ```
+This data set contains information about the New York City transit system (the Metropolitan Transportation Authority of the State of New York), specifically the NYC subway stations and their entrances and exits.  The data set contains information on station names, station latitude/longitude, lines, routes, ability to enter, entrance type, and whether the station is ADA accessible.  In cleaning the data, many columns were removed including division, columns regarding staffing, columns with notes, corner location, and columns regarding entrance location.  Only the variables previously mentioned were selected and all variable names were cleaned to follow snake case.  The entry variable was converted from a character variable to a logical variable where "YES" was converted to "TRUE".  This means if the station has an entry, the entry variable is "TRUE" and if the station does not have an entry it is "FALSE" instead of "NO".  The data set has `r nrow(nyc_transit_df)` rows and `r ncol(nyc_transit_df)` columns.  The data is not tidy yet because each different route name is a column containing route numbers.  Route name and route number are both variables and each should have one column containing the different route names/numbers.
 
-This data set contains information about the New York City transit system (the Metropolitan Transportation Authority of the State of New York), specifically the NYC subway stations and their entrances and exits.  The data set contains information on station names, station latitude/longitude, lines, routes, ability to enter, entrance type, and whether the station is ADA accessible.  In cleaning the data, many columns were removed including division, column regarding staffing, columns with notes, corner location, and columns regarding entrance location.  Only the variables previously mentioned were selected and all variable names were cleaned to follow snake case.  The entry variable was converted from a character variable to a logical variable where "YES" was converted to "TRUE" meaning if the station has an entry the entry variable is "TRUE" and if the station does not have an entry it is "FALSE" instead of "NO".  The data set has `r nrow(nyc_transit_df)` rows and `r ncol(nyc_transit_df)` columns.  The data is not tidy yet because each different route is a column.  Route is a variable and should have one column containing the different routes.
 
+Answer questions about the NYC Transit data:
 
-Answer Questions about the NYC Transit data:
 ```{r}
 nyc_stations_df <- nyc_transit_df %>% 
   unite(distinct_stations, c("line", "station_name"), sep = "_") %>% 
@@ -103,9 +104,7 @@ nyc_stations_df <- nyc_transit_df %>%
   count()
 
 head(nyc_stations_df)
-nrow(nyc_stations_df)
 
-#465
 
 nyc_stations_ADA <- nyc_transit_df %>% 
   unite(distinct_stations, c("line", "station_name"), sep = "_") %>% 
@@ -113,8 +112,7 @@ nyc_stations_ADA <- nyc_transit_df %>%
   summarize()
 
 head(nyc_stations_ADA)
-sum(pull(nyc_stations_ADA, ada))
-#84
+
 
 nyc_stations_entrance <- nyc_transit_df %>% 
   unite(distinct_stations, c("line", "station_name"), sep = "_") %>%
@@ -123,18 +121,12 @@ nyc_stations_entrance <- nyc_transit_df %>%
   summarize()
 
 head(nyc_stations_entrance)
-sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)
-#0.3873874
-
-  
-
-  
 ```
-
-There are `r nrow(nyc_stations_df)` distinct stations.  Of all the stations, `r sum(pull(nyc_stations_ADA, ada))` are ADA compliant.The proportion of stations entrance/exits without vending that allow entry is `r sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)`.
+There are `r nrow(nyc_stations_df)` distinct stations.  Of all the stations, `r sum(pull(nyc_stations_ADA, ada))` are ADA compliant.  The proportion of stations entrance/exits without vending that allow entry is `r sum(pull(nyc_stations_entrance, entry)) / nrow(nyc_stations_entrance)`.
    
 
 Answer questions regarding the A train:
+
 ```{r reformat NYC transit data}
 nyc_transit_df_tidy <- nyc_transit_df %>%
   mutate(route8 = as.character(route8)) %>%
@@ -146,23 +138,22 @@ nyc_transit_df_tidy <- nyc_transit_df %>%
     names_to = "route_name", 
     values_to = "route_number")
 
+head(nyc_transit_df_tidy)
+
 nyc_transit_A_train_df <- nyc_transit_df_tidy %>% unite(distinct_stations, c("line", "station_name"), sep = "_") %>% 
   filter(route_number == "A") %>%
   group_by(distinct_stations, route_number, ada) %>%
   summarize()
-  
-nrow(nyc_transit_A_train_df)
-sum(pull(nyc_transit_A_train_df, ada))
 
-#View(nyc_transit_df_tidy)
-#View(nyc_transit_A_train_df)
+head(nyc_transit_A_train_df)
 ```
-
 `r nrow(nyc_transit_A_train_df)` distinct stations serve the A train.  Of the stations that serve the A train, `r sum(pull(nyc_transit_A_train_df, ada))` are ADA compliant.
+
 
 ## Problem 3
 
 Read in the FiveThirtyEight pols_month data.
+
 ```{r read fivethirtyeight pols_month data}
 pols_month_df <- read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>% 
   janitor::clean_names() %>%
@@ -172,15 +163,12 @@ pols_month_df <- read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>%
   select(!month_2) %>%
   mutate(president = case_when(prez_gop == 1 ~ "gop", prez_gop == 2 ~ "gop_ford_after_nixon", prez_gop == 0 ~ "dem")) %>%
   select(!prez_gop & !prez_dem & !day) 
+
+head(pols_month_df)
 ```
 
+Read in the FiveThirtyEight snp data.
 
-
-pols-month.csv, unemployment.csv, and snp.csv. Our goal is to merge these into a single data frame using year and month as keys across datasets.
-
-clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns
-
-WHICH IS MONTH AND WHICH IS DAY PLEAE FIX!
 ```{r fivethirtyeight snp data}
 snp_df <- read_csv("./data/fivethirtyeight_datasets/snp.csv") %>% 
   janitor::clean_names() %>% 
@@ -190,9 +178,11 @@ snp_df <- read_csv("./data/fivethirtyeight_datasets/snp.csv") %>%
   select(!month_2 & !day)  %>%
   relocate(year)
 
-#View(snp_df)
+head(snp_df)
 ```
-Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
+
+Read in the FiveThirtyEight unemployment data.
+
 ```{r fivethirtyeight unemployment data}
 unemployment_df <- read_csv("./data/fivethirtyeight_datasets/unemployment.csv") %>% 
   janitor::clean_names() %>%
@@ -202,17 +192,19 @@ unemployment_df <- read_csv("./data/fivethirtyeight_datasets/unemployment.csv") 
     values_to = "unemployment_rate") %>%
   mutate(year = as.character(year))
 
-#View(unemployment_df)
+head(unemployment_df)
 ```
-Join the datasets by merging snp into pols, and merging unemployment into the result:
+
+
+Join the data sets by merging snp into pols_month, and merging unemployment into the result:
+
 ```{r join fivethirtyeight data}
 pols_snp_df <- left_join(pols_month_df, snp_df, by=c("year" = "year", "month" = "month"))
-View(pols_snp_df)
+head(pols_snp_df)
 
 pols_snp_unemployment_df <- left_join(pols_snp_df, unemployment_df, by=c("year" = "year", "month" = "month"))
-View(pols_snp_unemployment_df)
+head(pols_snp_unemployment_df)
 ```
-
 The three data sets, pols-month.csv, unemployment.csv, and snp.csv are from a larger collection of data sets from the website FiveThirtyEight.  They are used in an interactive graphic which is a part of an article called "Science Isn't Broken".  The graphic demonstrates how data about Republicans and Democrats in office can be manipulated to provide desired results about the US economy.  The pols-month data set contains information regarding the number of national politicians who are democratic or republican at any given time.  This includes variables like mon(date), prez_gop (whether the president is GOP or not), and sen_dem(the number of democratic senators).  The unemployment data set contains a year variable and a variable for each month.  For each year and month the unemployment rate is provided.  The snp data set contains information related to Standard & Poor’s stock market index (S&P) and includes two variables; date(date of observation) and close(closing stock market values).  The data set combining these three data sets has `r ncol(pols_snp_unemployment_df)` variables and `r nrow(pols_snp_unemployment_df)` rows.  The years included in the data set range from `r min(pull(pols_snp_unemployment_df, year))` to `r max(pull(pols_snp_unemployment_df, year))`.  The key variables are the month, year, president(whether the president was republican or democratic), close(stock market closing values), unemployment_rate, and 6 variables indicating the number of republican and democratic senators, representatives, and governors.
 
 
