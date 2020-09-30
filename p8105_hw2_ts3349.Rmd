@@ -113,10 +113,7 @@ head(nyc_stations_ADA)
 
 
 nyc_stations_entrance <- nyc_transit_df %>% 
-  unite(distinct_stations, c("line", "station_name"), sep = "_") %>%
-  filter(vending == "NO") %>%
-  group_by(distinct_stations, entry) %>%
-  summarize()
+  filter(vending == "NO")
 
 head(nyc_stations_entrance)
 ```
