@@ -2,9 +2,7 @@
 title: "p8105_hw2_ts3349"
 author: "Tessa Senders"
 date: "9/25/2020"
-output:
-  html_document:
-    df_print: paged
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
