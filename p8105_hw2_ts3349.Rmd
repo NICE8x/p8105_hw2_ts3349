@@ -99,7 +99,7 @@ Answer questions about the NYC Transit data:
 nyc_stations_df <- nyc_transit_df %>% 
   unite(distinct_stations, c("line", "station_name"), sep = "_") %>% 
   group_by(distinct_stations) %>%
-  count()
+  summarize()
 
 head(nyc_stations_df)
 
